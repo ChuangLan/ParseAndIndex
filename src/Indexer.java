@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.json.*;
+
+//@author Troy (Chuang Lan)
+
 public class Indexer {
 	final static String[] stopWords = { "a", "able", "about", "above", "abst", "accordance", "according", "accordingly",
 			"across", "act", "actually", "added", "adj", "affected", "affecting", "affects", "after", "afterwards",
@@ -155,7 +158,7 @@ public class Indexer {
 		//Initialize the input
 		int currentID = 0;
 		setCurrentNodeID(currentID);
-		String filePath = "path/fileName";
+		String filePath = "path/BigBang.txt";
 		//Go to Parser
 		String fileName = filePath.substring(filePath.lastIndexOf("/")+1, filePath.length());
 			test(fileName);		//From parser
@@ -264,16 +267,11 @@ public class Indexer {
 			test("----------------------------");
 			test("Word: " + word);
 			test("NodeList: " + WordTable.get(word));			
-		}
-		
+		}	
 		
 		
 		//UpdateRootFile
 		
-		//UpdateNodeTable
-		//UpdateLinkTable
-		//UpdateInvertedIndex
-		//UpdateLinkTable
 	}
 
 	private String StemWord(String text) {
