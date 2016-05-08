@@ -73,7 +73,7 @@ public class Indexer {
 			"wish", "with", "within", "without", "wont", "words", "world", "would", "wouldnt", "www", "x", "y",
 			"yes", "yet", "you", "youd", "you'll", "your", "youre", "yours", "yourself", "yourselves", "you've",
 			"z", "zero" };
-	public static int currentNodeId = 0;
+	public static int currentNodeId;
 	public static String userName = "";
 	public static String status = "Ready";
 	
@@ -84,6 +84,9 @@ public class Indexer {
 	
 	public static void Index(){
 		//Initialize the input
+		//Still needed since the program might be terminated
+//		int currentID = 0;
+//		setCurrentNodeID(currentID);
 		String filePath = "path/BigBang.txt";
 		//Go to Parser
 		String fileName = filePath.substring(filePath.lastIndexOf("/")+1, filePath.length());
@@ -334,6 +337,7 @@ public class Indexer {
 		WordTable = new HashMap<String, String>();
 		userName = "";
 		status = "Ready";
-		/**TODO: setCurrentNodeID**/		
+		/**TODO: setCurrentNodeID**/
+		//setCurrentNodeID(0);
 	}	
 }
