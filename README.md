@@ -16,7 +16,7 @@ The Indexing is in several parts below:
 5. Send all the stuff into MongoDB
 
 TODO:
-1. Set the indexer to be static and create a new "Status" var since we cannot do this multi-threaded
-2. Don't create link between nodes in one file
+1. Set the indexer to be static and create a new "Status" var since we cannot do this multi-threaded (Doing)
+2. Don't create link between nodes in one file (Done)
 3. Update the linkTable when we fetch the existed WordList
-4. 
+4. Save the start and end nodeID for the file

@@ -73,88 +73,16 @@ public class Indexer {
 			"wish", "with", "within", "without", "wont", "words", "world", "would", "wouldnt", "www", "x", "y",
 			"yes", "yet", "you", "youd", "you'll", "your", "youre", "yours", "yourself", "yourselves", "you've",
 			"z", "zero" };
-	private int currentNodeId = 0;
-	public String userName = "";
-	//@Entity
-	public class Node {
-		private String key = "";
-		private String value = "";
-		//@PrimaryKey
-		private int id = -1;
-		private int parentID = -1;
-		private int rootID = -1;
-		private String permission = "";
-		Node(String k, String v){
-			this.key = k;
-			this.value = v;
-			this.id = currentNodeId;
-			this.rootID = id;
-			currentNodeId++;
-		}
-		Node(String k, String v, int rID, int pID){
-			this.key = k;
-			this.value = v;
-			this.parentID = pID;
-			this.rootID = rID;
-			this.id = currentNodeId;
-			currentNodeId++;
-		}
-		
-		public void setPermission(String userName){
-			if(userName.equals("")) return;
-			this.permission = userName;
-		}
-		
-		public String getKey(){
-			return this.key;
-		}
-		public String getValue(){
-			return this.value;
-		}
-		public int getId(){
-			return this.id;
-		}
-		public int getParentID(){
-			return this.parentID;
-		}
-		public int getRootID(){
-			return this.rootID;
-		}
-		
-		public boolean isRoot(){
-			return (id == rootID);
-		}
-		
-		public String gerPermission(){
-			return this.permission;
-		}
-		
-		public boolean isPublic(){
-			return this.permission.equals("");
-		}
-		
-	}
-	public class Link {
-		private int nodeID1 = -1;
-		private int nodeID2 = -1;
-		Link(int n1, int n2){
-			nodeID1 = n1;
-			nodeID2 = n2;
-		}
-		public int getNodeID1(){
-			return nodeID1;
-		}
-		public int getNodeID2(){
-			return nodeID2;
-		}
-	}
+	public static int currentNodeId = 0;
+	public static String userName = "";
+	public static String status = "Ready";
 	
-	public ArrayList<Node> NodeTable = new ArrayList<Node>();
-	public ArrayList<Link> LinkTable = new ArrayList<Link>();
-	public HashMap<String, String> WordTable = new HashMap<String, String>();
+	public static ArrayList<Node> NodeTable = new ArrayList<Node>();
+	public static ArrayList<Link> LinkTable = new ArrayList<Link>();
+	public static HashMap<String, String> WordTable = new HashMap<String, String>();
 	//public HashMap<Integer, String> RootFile = new HashMap<Integer, String>();
 	
-	public void Index(){
+	public static void Index(){
 		//Initialize the input
 		int currentID = 0;
 		setCurrentNodeID(currentID);
@@ -274,7 +202,7 @@ public class Indexer {
 		
 	}
 
-	private String StemWord(String text) {
+	public static String StemWord(String text) {
 		/**TODO: Remove Digits**/
 		//SPECIAL CHARACTERS
 		if(isStopWord(text)) return "";
@@ -291,7 +219,7 @@ public class Indexer {
 		return st.toString();
 	}
 
-	private boolean isStopWord(String word) {
+	public static boolean isStopWord(String word) {
 		String wordLower = word.toLowerCase();
 		
 		//STOP WORDS
@@ -301,13 +229,13 @@ public class Indexer {
 		return false;
 	}
 
-	private void setPermission(ArrayList<Node> nodeTable, String userName) {
+	public static void setPermission(ArrayList<Node> nodeTable, String userName) {
 		for(Node n: nodeTable){
 			n.setPermission(userName);
 		}		
 	}
 
-	private void handleObject(JSONObject obj, int rootID, int parentID) {
+	public static void handleObject(JSONObject obj, int rootID, int parentID) {
 		Iterator<?> keys = obj.keys();
 		while( keys.hasNext() ) {
 		    String key = (String)keys.next();
@@ -357,7 +285,7 @@ public class Indexer {
 		}
 	}
 
-	private void handleArray(JSONArray array, String key, int rootID, int parentID) {
+	public static void handleArray(JSONArray array, String key, int rootID, int parentID) {
 		for(int i = 0; i < array.length(); i++){
 			JSONObject obj = array.getJSONObject(i);
 			String newKey = key + "_member_" + i;
@@ -368,7 +296,7 @@ public class Indexer {
 		}		
 	}
 
-	private void UpdateInvertedIndex(String word, int nodeID) {
+	public static void UpdateInvertedIndex(String word, int nodeID) {
 		//Fetch the original nodeIDList of word
 		String nodeIdList = "".trim();
 		if(nodeIdList.equals("")) 
@@ -378,29 +306,36 @@ public class Indexer {
 		//Update the table	
 	}
 	
-	private void AddLink2Table(int n1, int n2){
+	public static void AddLink2Table(int n1, int n2){
 		Link link = new Link(n1, n2);
 		/**Add to the list**/
 		LinkTable.add(link);
 	}
 	
-	private void AddNode2Table(Node node){
+	public static void AddNode2Table(Node node){
 		
 		/**Add to the list**/
 	}
 	
-	private void AddRootFile2Table(int rootID, String filePath){
+	public static void AddRootFile2Table(int rootID, String filePath){
 		
 		/**Add to the list**/
 	}
 
-	private void test(Object text) {
+	public static void test(Object text) {
 		System.out.println(text.toString());		
 	}
 
-	private void setCurrentNodeID(int cID) {
-		this.currentNodeId = cID;
+	public static void setCurrentNodeID(int cID) {
+		currentNodeId = cID;
 		
+	}
+	public static void clean(){
+		NodeTable = new ArrayList<Node>();
+		LinkTable = new ArrayList<Link>();
+		WordTable = new HashMap<String, String>();
+		userName = "";
+		status = "Ready";
 	}
 	
 }
