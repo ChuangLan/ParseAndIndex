@@ -226,25 +226,25 @@ public class Indexer {
 			}
 		}
 		//Update link table
-		for(String word: WordTable.keySet()){
-			//test(WordTable.get(word));
-			String[] nodeList = WordTable.get(word).split("&");
-			LinkedList<Integer> nodeIdList = new LinkedList<Integer>();
-			for(String nodeId: nodeList){
-				if(!nodeId.equals("")){
-					//test("id: " + nodeId);
-					int id = Integer.parseInt(nodeId);
-					nodeIdList.add(id);
-				}
-			}
-			while(nodeIdList.size() > 1){
-				int first = nodeIdList.pop();
-				for(int n: nodeIdList){
-					Link link = new Link(first, n);
-					LinkTable.add(link);
-				}
-			}
-		}
+//		for(String word: WordTable.keySet()){
+//			//test(WordTable.get(word));
+//			String[] nodeList = WordTable.get(word).split("&");
+//			LinkedList<Integer> nodeIdList = new LinkedList<Integer>();
+//			for(String nodeId: nodeList){
+//				if(!nodeId.equals("")){
+//					//test("id: " + nodeId);
+//					int id = Integer.parseInt(nodeId);
+//					nodeIdList.add(id);
+//				}
+//			}
+//			while(nodeIdList.size() > 1){
+//				int first = nodeIdList.pop();
+//				for(int n: nodeIdList){
+//					Link link = new Link(first, n);
+//					LinkTable.add(link);
+//				}
+//			}
+//		}
 		
 		/**Add all the data to database**/
 
