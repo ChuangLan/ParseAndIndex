@@ -173,10 +173,11 @@ public class Indexer {
 //				}
 //			}
 //		}
+		/**TODO: UpdateRootFile with startID and endID**/
 		
-		/**Add all the data to database**/
+		/**TODO: Add all the data to database**/
 
-		
+		/**TEST the output table**/
 		for(Node node: NodeTable){
 			test("----------------------------");
 			test("NodeID: " + node.getId());
@@ -197,9 +198,8 @@ public class Indexer {
 			test("NodeList: " + WordTable.get(word));			
 		}	
 		
-		
-		//UpdateRootFile
-		
+		//Clean the indexer after indexed
+		clean();		
 	}
 
 	public static String StemWord(String text) {
@@ -308,18 +308,18 @@ public class Indexer {
 	
 	public static void AddLink2Table(int n1, int n2){
 		Link link = new Link(n1, n2);
-		/**Add to the list**/
+		/**TODO: Add to the list**/
 		LinkTable.add(link);
 	}
 	
 	public static void AddNode2Table(Node node){
 		
-		/**Add to the list**/
+		/**TODO: Add to the list**/
 	}
 	
 	public static void AddRootFile2Table(int rootID, String filePath){
 		
-		/**Add to the list**/
+		/**TODO: Add to the list**/
 	}
 
 	public static void test(Object text) {
@@ -336,6 +336,6 @@ public class Indexer {
 		WordTable = new HashMap<String, String>();
 		userName = "";
 		status = "Ready";
-	}
-	
+		/**TODO: setCurrentNodeID**/		
+	}	
 }
