@@ -249,20 +249,20 @@ public class Indexer {
 		/**Add all the data to database**/
 
 		
-//		for(Node node: NodeTable){
-//			test("----------------------------");
-//			test("NodeID: " + node.getId());
-//			test("Key: " + node.getKey());
-//			test("Value: " + node.getValue());
-//			test("ParentID: " + node.getParentID());
-//			test("Root: " + node.getRootID());
-//			test("Permission: " + node.gerPermission());
-//		}
-//		for(Link link: LinkTable){
-//			test("----------------------------");
-//			test("Node1: " + link.getNodeID1());
-//			test("Node2: " + link.getNodeID2());
-//		}
+		for(Node node: NodeTable){
+			test("----------------------------");
+			test("NodeID: " + node.getId());
+			test("Key: " + node.getKey());
+			test("Value: " + node.getValue());
+			test("ParentID: " + node.getParentID());
+			test("Root: " + node.getRootID());
+			test("Permission: " + node.gerPermission());
+		}
+		for(Link link: LinkTable){
+			test("----------------------------");
+			test("Node1: " + link.getNodeID1());
+			test("Node2: " + link.getNodeID2());
+		}
 		for(String word: WordTable.keySet()){
 			test("----------------------------");
 			test("Word: " + word);
