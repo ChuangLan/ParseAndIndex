@@ -73,7 +73,7 @@ public class Indexer {
 			"wish", "with", "within", "without", "wont", "words", "world", "would", "wouldnt", "www", "x", "y",
 			"yes", "yet", "you", "youd", "you'll", "your", "youre", "yours", "yourself", "yourselves", "you've",
 			"z", "zero" };
-	public static int currentNodeId;
+	public static int currentNodeId = 0;
 	public static String userName = "";
 	public static String status = "Ready";
 	
@@ -84,9 +84,12 @@ public class Indexer {
 	
 	public static void Index(){
 		//Initialize the input
-		//Still needed since the program might be terminated
-//		int currentID = 0;
-//		setCurrentNodeID(currentID);
+
+		if(currentNodeId == 0) {
+			/**Still needed since the program might be terminated**/
+//			int currentID = 0;
+//			setCurrentNodeID(currentID);
+		}
 		String filePath = "path/BigBang.txt";
 		//Go to Parser
 		String fileName = filePath.substring(filePath.lastIndexOf("/")+1, filePath.length());
@@ -105,6 +108,7 @@ public class Indexer {
 		//Add root node
 		Node rootNode = new Node(fileName, "");
 		NodeTable.add(rootNode);
+
 		//Recursively add node and link
 		handleObject(root, rootNode.getId(), rootNode.getId());
 		//Set permission for the file
@@ -175,29 +179,35 @@ public class Indexer {
 //			}
 //		}
 		/**TODO: UpdateRootFile with startID and endID**/
+		String rootID = Integer.toString(rootNode.getId());
+		test(rootID);
+		String lastID = Integer.toString(currentNodeId);
+		test(lastID);
+		String fileInfo = "FilePath:" + filePath + "&" + "FileName:" + fileName + "&" + "LastID:" + lastID;
+		test(fileInfo);
 		
 		/**TODO: Add all the data to database**/
 
 		/**TEST the output table**/
-		for(Node node: NodeTable){
-			test("----------------------------");
-			test("NodeID: " + node.getId());
-			test("Key: " + node.getKey());
-			test("Value: " + node.getValue());
-			test("ParentID: " + node.getParentID());
-			test("Root: " + node.getRootID());
-			test("Permission: " + node.gerPermission());
-		}
-		for(Link link: LinkTable){
-			test("----------------------------");
-			test("Node1: " + link.getNodeID1());
-			test("Node2: " + link.getNodeID2());
-		}
-		for(String word: WordTable.keySet()){
-			test("----------------------------");
-			test("Word: " + word);
-			test("NodeList: " + WordTable.get(word));			
-		}	
+//		for(Node node: NodeTable){
+//			test("----------------------------");
+//			test("NodeID: " + node.getId());
+//			test("Key: " + node.getKey());
+//			test("Value: " + node.getValue());
+//			test("ParentID: " + node.getParentID());
+//			test("Root: " + node.getRootID());
+//			test("Permission: " + node.gerPermission());
+//		}
+//		for(Link link: LinkTable){
+//			test("----------------------------");
+//			test("Node1: " + link.getNodeID1());
+//			test("Node2: " + link.getNodeID2());
+//		}
+//		for(String word: WordTable.keySet()){
+//			test("----------------------------");
+//			test("Word: " + word);
+//			test("NodeList: " + WordTable.get(word));			
+//		}	
 		
 		//Clean the indexer after indexed
 		clean();		
