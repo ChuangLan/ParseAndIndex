@@ -84,8 +84,6 @@ public class Indexer {
 	
 	public static void Index(){
 		//Initialize the input
-		int currentID = 0;
-		setCurrentNodeID(currentID);
 		String filePath = "path/BigBang.txt";
 		//Go to Parser
 		String fileName = filePath.substring(filePath.lastIndexOf("/")+1, filePath.length());
