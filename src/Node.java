@@ -1,3 +1,4 @@
+import org.bson.Document;
 
 public class Node {
 	private String key = "";
@@ -54,6 +55,17 @@ public class Node {
 	
 	public boolean isPublic(){
 		return this.permission.equals("");
+	}
+	public Object toJson() {
+		Document doc = 	new Document().append("id", id)
+				.append("key", key)
+				.append("value", value)
+				.append("parentID", parentID)
+				.append("rootID", rootID)
+				.append("permission", permission)
+				;
+		return doc;
+		
 	}
 	
 }

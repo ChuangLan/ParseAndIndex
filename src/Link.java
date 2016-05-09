@@ -1,3 +1,4 @@
+import org.bson.Document;
 
 public class Link {
 	private int nodeID1 = -1;
@@ -11,5 +12,9 @@ public class Link {
 	}
 	public int getNodeID2(){
 		return nodeID2;
+	}
+	public Object toJson(){
+		Document doc = new Document().append("nodeID1", nodeID1).append("nodeID2", nodeID2);
+		return doc;
 	}
 }

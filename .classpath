@@ -5,5 +5,8 @@
 	<classpathentry kind="con" path="com.amazonaws.eclipse.sdk.AWS_JAVA_SDK"/>
 	<classpathentry kind="lib" path="lib/json-20160212.jar"/>
 	<classpathentry kind="lib" path="lib/json-simple.jar"/>
+	<classpathentry kind="lib" path="lib/mongo-java-driver-3.0.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/mongo-java-driver-3.0.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/mongo-java-driver-3.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

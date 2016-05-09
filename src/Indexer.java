@@ -1,11 +1,19 @@
 import java.io.File;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
 import org.json.*;
+import com.mongodb.*;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+
+import org.bson.*;
 
 //@author Troy (Chuang Lan)
 
@@ -76,23 +84,25 @@ public class Indexer {
 	public static int currentNodeId = 0;
 	public static String userName = "";
 	public static String status = "Ready";
+	public static String filePath = "";
+	public static String fileName = "";
+	public static boolean inited = false;
 	
 	public static ArrayList<Node> NodeTable = new ArrayList<Node>();
 	public static ArrayList<Link> LinkTable = new ArrayList<Link>();
-	public static HashMap<String, String> WordTable = new HashMap<String, String>();
+	public static HashMap<String, String> WordMap = new HashMap<String, String>();
+	public static ArrayList<Word> WordTable = new ArrayList<Word>();
 	//public HashMap<Integer, String> RootFile = new HashMap<Integer, String>();
 	
 	public static void Index(){
 		//Initialize the input
-
-		if(currentNodeId == 0) {
-			/**Still needed since the program might be terminated**/
-//			int currentID = 0;
-//			setCurrentNodeID(currentID);
-		}
-		String filePath = "path/BigBang.txt";
+		if(!inited){
+			InitializeCurrentID();
+			inited = true;
+		}		
+		filePath = "path/BigBang.txt";
 		//Go to Parser
-		String fileName = filePath.substring(filePath.lastIndexOf("/")+1, filePath.length());
+		fileName = filePath.substring(filePath.lastIndexOf("/")+1, filePath.length());
 			test(fileName);		//From parser
 		String jsonString = "";	//From parser
 		
@@ -116,16 +126,16 @@ public class Indexer {
 		//Add inverted index
 		for(Node node: NodeTable){
 			if(node.isRoot()){
-				//Root node added into WordTable
+				//Root node added into WordMap
 				String rawKey = node.getKey().trim().toLowerCase();
 				/**Stemmed!**/					
 				String word = StemWord(rawKey.trim());
 				if(word.equals("")) continue;
-				if(WordTable.containsKey(word)) {
-					WordTable.put(word, WordTable.get(word) + "&" + node.getId());
+				if(WordMap.containsKey(word)) {
+					WordMap.put(word, WordMap.get(word) + "&" + node.getId());
 				}
 				else {
-					WordTable.put(word, "&" + node.getId());
+					WordMap.put(word, "&" + node.getId());
 				}		
 			}
 			else if(!node.getValue().equals("")){
@@ -137,11 +147,11 @@ public class Indexer {
 					/**Stemmed!**/	
 					String word = StemWord(rt.trim().toLowerCase());
 					if(word.equals("")) continue;
-					if(WordTable.containsKey(word)) {
-						WordTable.put(word, WordTable.get(word) + "&" + node.getId());
+					if(WordMap.containsKey(word)) {
+						WordMap.put(word, WordMap.get(word) + "&" + node.getId());
 					}
 					else {
-						WordTable.put(word, "&" + node.getId());
+						WordMap.put(word, "&" + node.getId());
 					}						
 				}
 				for(String rt: rawValue){
@@ -149,36 +159,40 @@ public class Indexer {
 					/**Stemmed!**/						
 					String word = StemWord(rt.trim().toLowerCase());
 					if(word.equals("")) continue;
-					if(WordTable.containsKey(word)) {
-						WordTable.put(word, WordTable.get(word) + "&" + node.getId());
+					if(WordMap.containsKey(word)) {
+						WordMap.put(word, WordMap.get(word) + "&" + node.getId());
 					}
 					else {
-						WordTable.put(word, "&" + node.getId());
+						WordMap.put(word, "&" + node.getId());
 					}					
 				}				
 			}
 		}
-		//Update link table
-//		for(String word: WordTable.keySet()){
-//			//test(WordTable.get(word));
-//			String[] nodeList = WordTable.get(word).split("&");
-//			LinkedList<Integer> nodeIdList = new LinkedList<Integer>();
-//			for(String nodeId: nodeList){
-//				if(!nodeId.equals("")){
-//					//test("id: " + nodeId);
-//					int id = Integer.parseInt(nodeId);
-//					nodeIdList.add(id);
-//				}
-//			}
-//			while(nodeIdList.size() > 1){
-//				int first = nodeIdList.pop();
-//				for(int n: nodeIdList){
-//					Link link = new Link(first, n);
-//					LinkTable.add(link);
-//				}
-//			}
-//		}
-		/**TODO: UpdateRootFile with startID and endID**/
+		/**TODO: Add all the data to database**/
+		Write2MongoDB();
+
+		
+		/**TEST: the output table**/
+		for(Node node: NodeTable){
+			test("----------------------------");
+			test("NodeID: " + node.getId());
+			test("Key: " + node.getKey());
+			test("Value: " + node.getValue());
+			test("ParentID: " + node.getParentID());
+			test("Root: " + node.getRootID());
+			test("Permission: " + node.gerPermission());
+		}
+		for(Link link: LinkTable){
+			test("----------------------------");
+			test("Node1: " + link.getNodeID1());
+			test("Node2: " + link.getNodeID2());
+		}
+		for(String word: WordMap.keySet()){
+			test("----------------------------");
+			test("Word: " + word);
+			test("NodeList: " + WordMap.get(word));			
+		}	
+		/**TEST: UpdateRootFile with startID and endID**/
 		String rootID = Integer.toString(rootNode.getId());
 		test(rootID);
 		String lastID = Integer.toString(currentNodeId);
@@ -186,31 +200,89 @@ public class Indexer {
 		String fileInfo = "FilePath:" + filePath + "&" + "FileName:" + fileName + "&" + "LastID:" + lastID;
 		test(fileInfo);
 		
-		/**TODO: Add all the data to database**/
-
-		/**TEST the output table**/
-//		for(Node node: NodeTable){
-//			test("----------------------------");
-//			test("NodeID: " + node.getId());
-//			test("Key: " + node.getKey());
-//			test("Value: " + node.getValue());
-//			test("ParentID: " + node.getParentID());
-//			test("Root: " + node.getRootID());
-//			test("Permission: " + node.gerPermission());
-//		}
-//		for(Link link: LinkTable){
-//			test("----------------------------");
-//			test("Node1: " + link.getNodeID1());
-//			test("Node2: " + link.getNodeID2());
-//		}
-//		for(String word: WordTable.keySet()){
-//			test("----------------------------");
-//			test("Word: " + word);
-//			test("NodeList: " + WordTable.get(word));			
-//		}	
-		
 		//Clean the indexer after indexed
 		clean();		
+	}
+
+	private static void InitializeCurrentID() {
+        MongoClientURI uri  = new MongoClientURI("mongodb://dingz:cis550@ds021731.mlab.com:21731/550project");        
+        MongoClient client = new MongoClient(uri);
+        MongoDatabase db = client.getDatabase(uri.getDatabase());
+        MongoCollection files = db.getCollection("FileTable");
+        
+        MongoCursor<Document> cursor = files.find().iterator();
+        
+        Document docNode = new Document();
+        while(cursor.hasNext()){
+        	docNode = cursor.next();        	       	
+        }
+        Object current = docNode.get("currentID");
+        if(current != null)
+        	currentNodeId = Integer.parseInt(current.toString()); 
+        cursor.close();
+	}
+
+
+	private static void Write2MongoDB(){
+		
+        MongoClientURI uri  = new MongoClientURI("mongodb://dingz:cis550@ds021731.mlab.com:21731/550project");        
+        MongoClient client = new MongoClient(uri);
+        MongoDatabase db = client.getDatabase(uri.getDatabase());
+
+        MongoCollection nodes = db.getCollection("NodeTable");
+        MongoCollection links = db.getCollection("LinkTable");
+        MongoCollection words = db.getCollection("WordTable");
+        MongoCollection files = db.getCollection("FileTable");
+        //Insert Nodes
+        for(Node n: NodeTable){
+        	nodes.insertOne(n.toJson());
+        }
+        //Update Words
+        MongoCursor<Document> cursor = words.find().iterator();
+        while(cursor.hasNext()){
+        	Document docNode = cursor.next();
+        	String word = docNode.get("word").toString();
+        	if(WordMap.containsKey(word)){
+        		updateLinkTable(word, docNode.get("index").toString());
+        		Document newDoc = new Document("word", word).append("index", docNode.get("index")+WordMap.get(word));
+        		words.findOneAndReplace(docNode, newDoc);
+        		WordMap.remove(word);
+        	}
+        }
+        cursor.close();
+		for(String w: WordMap.keySet()){
+			Word wordInfo = new Word(w, WordMap.get(w));
+			WordTable.add(wordInfo);
+		}
+        for(Word w: WordTable){
+        	words.insertOne(w.toJson());
+        }
+        //Insert Links
+        for(Link l: LinkTable){
+        	links.insertOne(l.toJson());
+        }
+        //Insert FileInfo
+        Document fileInfo = new Document("filePath", filePath)
+        		.append("fileName", fileName)
+        		.append("rootID", NodeTable.get(0).getRootID())
+        		.append("currentID", currentNodeId);  
+        files.insertOne(fileInfo);
+	}
+
+	private static void updateLinkTable(String word, String oldIndex) {
+		String[] oldIDs = oldIndex.split("&");
+		String[] newIDs = WordMap.get(word).split("&");
+		for(String o: oldIDs){
+			if(!o.equals("")){
+				int oID = Integer.parseInt(o);
+				for(String n: newIDs){
+					if(!n.equals("")){
+						int nID = Integer.parseInt(n);
+						AddLink2Table(oID, nID);
+					}
+				}
+			}		
+		}
 	}
 
 	public static String StemWord(String text) {
@@ -322,16 +394,6 @@ public class Indexer {
 		/**TODO: Add to the list**/
 		LinkTable.add(link);
 	}
-	
-	public static void AddNode2Table(Node node){
-		
-		/**TODO: Add to the list**/
-	}
-	
-	public static void AddRootFile2Table(int rootID, String filePath){
-		
-		/**TODO: Add to the list**/
-	}
 
 	public static void test(Object text) {
 		System.out.println(text.toString());		
@@ -344,9 +406,12 @@ public class Indexer {
 	public static void clean(){
 		NodeTable = new ArrayList<Node>();
 		LinkTable = new ArrayList<Link>();
-		WordTable = new HashMap<String, String>();
+		WordMap = new HashMap<String, String>();
+		WordTable = new ArrayList<Word>();
 		userName = "";
 		status = "Ready";
+		filePath = "";
+		fileName = "";
 		/**TODO: setCurrentNodeID**/
 		//setCurrentNodeID(0);
 	}	
