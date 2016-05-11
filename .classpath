@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="lib/mongo-java-driver-3.0.2-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-java-driver-3.0.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-java-driver-3.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/json-lib-2.4-jdk15.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

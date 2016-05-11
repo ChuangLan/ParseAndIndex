@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,18 +95,27 @@ public class Indexer {
 	public static ArrayList<Word> WordTable = new ArrayList<Word>();
 	//public HashMap<Integer, String> RootFile = new HashMap<Integer, String>();
 	
-	public static void Index(){
+	public static void Index(String path){
 		//Initialize the input
 		if(!inited){
 			InitializeCurrentID();
-			inited = true;
+			inited = true;		
 		}		
-		filePath = "path/BigBang.txt";
-		//Go to Parser
+		filePath = path;
 		fileName = filePath.substring(filePath.lastIndexOf("/")+1, filePath.length());
-			test(fileName);		//From parser
+		test(fileName);
+		//Go to Parser
+		/********************/
+		status = "Parsing";
+		test(status+"...\n");
+		/********************/
 		String jsonString = "";	//From parser
-		
+		try {
+			jsonString = Parser.parse(filePath, filePath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String testInput =  "{\"Verbs\":[{\n" +
                 "    \"develop\":\"30d\", \"type\":\"ed\", \"rel\":1.0, \"id\":\"80\", \"hate\":\"en\", \"ct\":\"on\", \"sps\":null\n" +
                 "},{\n" +
@@ -113,16 +123,20 @@ public class Indexer {
                 "},{\n" +
                 "    \"of\":\"81\", \"type\":\"nn\", \"rel\":3.0, \"id\":\"60\", \"and\":\"en\", \"ct\":\"on\", \"sps\":null\n" +
                 "}]}";
-		jsonString = testInput;
+
+		//jsonString = testInput;
+		
 		JSONObject root = new JSONObject(jsonString.trim());
+		/********************/
+		status = "Indexing";
+		test(status+"...\n");
+		/********************/
 		//Add root node
 		Node rootNode = new Node(fileName, "");
 		NodeTable.add(rootNode);
 
 		//Recursively add node and link
-		handleObject(root, rootNode.getId(), rootNode.getId());
-		//Set permission for the file
-		setPermission(NodeTable, userName);
+		handleObject(root, rootNode.getId(), rootNode.getId(), 0);
 		//Add inverted index
 		for(Node node: NodeTable){
 			if(node.isRoot()){
@@ -138,9 +152,9 @@ public class Indexer {
 					WordMap.put(word, "&" + node.getId());
 				}		
 			}
-			else if(!node.getValue().equals("")){
+			else {
 				//Only Leaf Node
-				String[] rawValue = node.getValue().trim().split(" ");
+
 				String[] rawKey = node.getKey().trim().split(" ");
 				for(String rt: rawKey){
 					//Leaf Node's key
@@ -154,18 +168,22 @@ public class Indexer {
 						WordMap.put(word, "&" + node.getId());
 					}						
 				}
-				for(String rt: rawValue){
-					//Leaf Node's value
-					/**Stemmed!**/						
-					String word = StemWord(rt.trim().toLowerCase());
-					if(word.equals("")) continue;
-					if(WordMap.containsKey(word)) {
-						WordMap.put(word, WordMap.get(word) + "&" + node.getId());
+				if(!node.getValue().equals("")){
+					String[] rawValue = node.getValue().trim().split(" ");
+					for(String rt: rawValue){
+						//Leaf Node's value
+						/**Stemmed!**/						
+						String word = StemWord(rt.trim().toLowerCase());
+						if(word.equals("")) continue;
+						if(WordMap.containsKey(word)) {
+							WordMap.put(word, WordMap.get(word) + "&" + node.getId());
+						}
+						else {
+							WordMap.put(word, "&" + node.getId());
+						}					
 					}
-					else {
-						WordMap.put(word, "&" + node.getId());
-					}					
-				}				
+				}
+								
 			}
 		}
 		/**TODO: Add all the data to database**/
@@ -173,38 +191,42 @@ public class Indexer {
 
 		
 		/**TEST: the output table**/
-		for(Node node: NodeTable){
-			test("----------------------------");
-			test("NodeID: " + node.getId());
-			test("Key: " + node.getKey());
-			test("Value: " + node.getValue());
-			test("ParentID: " + node.getParentID());
-			test("Root: " + node.getRootID());
-			test("Permission: " + node.gerPermission());
-		}
-		for(Link link: LinkTable){
-			test("----------------------------");
-			test("Node1: " + link.getNodeID1());
-			test("Node2: " + link.getNodeID2());
-		}
-		for(String word: WordMap.keySet()){
-			test("----------------------------");
-			test("Word: " + word);
-			test("NodeList: " + WordMap.get(word));			
-		}	
-		/**TEST: UpdateRootFile with startID and endID**/
-		String rootID = Integer.toString(rootNode.getId());
-		test(rootID);
-		String lastID = Integer.toString(currentNodeId);
-		test(lastID);
-		String fileInfo = "FilePath:" + filePath + "&" + "FileName:" + fileName + "&" + "LastID:" + lastID;
-		test(fileInfo);
+//		for(Node node: NodeTable){
+//			test("----------------------------");
+//			test("NodeID: " + node.getId());
+//			test("Key: " + node.getKey());
+//			test("Value: " + node.getValue());
+//			test("ParentID: " + node.getParentID());
+//			test("Root: " + node.getRootID());
+//			test("Permission: " + node.gerPermission());
+//		}
+//		for(Link link: LinkTable){
+//			test("----------------------------");
+//			test("Node1: " + link.getNodeID1());
+//			test("Node2: " + link.getNodeID2());
+//		}
+//		for(String word: WordMap.keySet()){
+//			test("----------------------------");
+//			test("Word: " + word);
+//			test("NodeList: " + WordMap.get(word));			
+//		}	
+//		/**TEST: UpdateRootFile with startID and endID**/
+//		String rootID = Integer.toString(rootNode.getId());
+//		test(rootID);
+//		String lastID = Integer.toString(currentNodeId);
+//		test(lastID);
+//		String fileInfo = "FilePath:" + filePath + "&" + "FileName:" + fileName + "&" + "LastID:" + lastID;
+//		test(fileInfo);
 		
 		//Clean the indexer after indexed
 		clean();		
 	}
 
 	private static void InitializeCurrentID() {
+		/********************/
+		status = "Initializing";
+		test(status+"...\n");
+		/********************/	
         MongoClientURI uri  = new MongoClientURI("mongodb://dingz:cis550@ds021731.mlab.com:21731/550project");        
         MongoClient client = new MongoClient(uri);
         MongoDatabase db = client.getDatabase(uri.getDatabase());
@@ -224,7 +246,10 @@ public class Indexer {
 
 
 	private static void Write2MongoDB(){
-		
+		/********************/
+		status = "Writing to DB";
+		test(status+"...\n");
+		/********************/
         MongoClientURI uri  = new MongoClientURI("mongodb://dingz:cis550@ds021731.mlab.com:21731/550project");        
         MongoClient client = new MongoClient(uri);
         MongoDatabase db = client.getDatabase(uri.getDatabase());
@@ -265,7 +290,8 @@ public class Indexer {
         Document fileInfo = new Document("filePath", filePath)
         		.append("fileName", fileName)
         		.append("rootID", NodeTable.get(0).getRootID())
-        		.append("currentID", currentNodeId);  
+        		.append("currentID", currentNodeId)
+        		.append("permission", "");;  
         files.insertOne(fileInfo);
 	}
 
@@ -289,6 +315,7 @@ public class Indexer {
 		/**TODO: Remove Digits**/
 		//SPECIAL CHARACTERS
 		if(isStopWord(text)) return "";
+//		return text;
 		for (char c : text.toCharArray()) {
 			if (!Character.isLetter(c)) { return ""; }
 		}
@@ -318,64 +345,104 @@ public class Indexer {
 		}		
 	}
 
-	public static void handleObject(JSONObject obj, int rootID, int parentID) {
+	public static void handleObject(JSONObject obj, int rootID, int parentID, int index) {
 		Iterator<?> keys = obj.keys();
 		while( keys.hasNext() ) {
 		    String key = (String)keys.next();
 		    if ( obj.get(key) instanceof JSONObject  ) {
 		    	JSONObject child = obj.getJSONObject(key);
 		    	Node node = new Node(key, "", rootID, parentID);
+		    	//update parent node
+		    	Node parentNode = NodeTable.get(index);
+		    	parentNode.addChildren(node.getId());
+		    	NodeTable.set(index, parentNode);
+		    	//update end
 		    	NodeTable.add(node);
-		    	AddLink2Table(parentID, node.getId());
-		    	handleObject(child, rootID, node.getId());
+		    	//AddLink2Table(parentID, node.getId());
+		    	handleObject(child, rootID, node.getId(), NodeTable.size()-1);
 		    }
 		    else if(obj.get(key) instanceof JSONArray){
 		    	JSONArray array = obj.getJSONArray(key);
 		    	Node node = new Node(key, "", rootID, parentID);
+		    	//update parent node
+		    	Node parentNode = NodeTable.get(index);
+		    	parentNode.addChildren(node.getId());
+		    	NodeTable.set(index, parentNode);
+		    	//update end
 		    	NodeTable.add(node);
-		    	AddLink2Table(parentID, node.getId());
-		    	handleArray(array, key, rootID, node.getId());
+		    	//AddLink2Table(parentID, node.getId());
+		    	handleArray(array, key, rootID, node.getId(), NodeTable.size()-1);
 		    }
 		    else if(obj.get(key) instanceof String){
 		    	String value = obj.getString(key);
 		    	Node node = new Node(key, value, rootID, parentID);
+		    	//update parent node
+		    	Node parentNode = NodeTable.get(index);
+		    	parentNode.addChildren(node.getId());
+		    	NodeTable.set(index, parentNode);
+		    	//update end
 		    	NodeTable.add(node);
-		    	AddLink2Table(parentID, node.getId());
+		    	//AddLink2Table(parentID, node.getId());
 		    }
 		    else if(obj.get(key) instanceof Integer){
 		    	int value = obj.getInt(key);
 		    	Node node = new Node(key, Integer.toString(value), rootID, parentID);
+		    	//update parent node
+		    	Node parentNode = NodeTable.get(index);
+		    	parentNode.addChildren(node.getId());
+		    	NodeTable.set(index, parentNode);
+		    	//update end
 		    	NodeTable.add(node);
-		    	AddLink2Table(parentID, node.getId());
+		    	//AddLink2Table(parentID, node.getId());
 		    }
 		    else if(obj.get(key) instanceof Double){
 		    	double value = obj.getDouble(key);
 		    	Node node = new Node(key, Double.toString(value), rootID, parentID);
+		    	//update parent node
+		    	Node parentNode = NodeTable.get(index);
+		    	parentNode.addChildren(node.getId());
+		    	NodeTable.set(index, parentNode);
+		    	//update end
 		    	NodeTable.add(node);
-		    	AddLink2Table(parentID, node.getId());
+		    	//AddLink2Table(parentID, node.getId());
 		    }
 		    else if(obj.get(key) instanceof Boolean){
 		    	boolean value = obj.getBoolean(key);
 		    	Node node = new Node(key, Boolean.toString(value), rootID, parentID);
+		    	//update parent node
+		    	Node parentNode = NodeTable.get(index);
+		    	parentNode.addChildren(node.getId());
+		    	NodeTable.set(index, parentNode);
+		    	//update end
 		    	NodeTable.add(node);
-		    	AddLink2Table(parentID, node.getId());
+		    	//AddLink2Table(parentID, node.getId());
 		    }
 		    else if(obj.get(key) == null){
 		    	Node node = new Node(key, null, rootID, parentID);
+		    	//update parent node
+		    	Node parentNode = NodeTable.get(index);
+		    	parentNode.addChildren(node.getId());
+		    	NodeTable.set(index, parentNode);
+		    	//update end
 		    	NodeTable.add(node);
-		    	AddLink2Table(parentID, node.getId());
+		    	//AddLink2Table(parentID, node.getId());
 		    }
 		}
 	}
 
-	public static void handleArray(JSONArray array, String key, int rootID, int parentID) {
+	public static void handleArray(JSONArray array, String key, int rootID, int parentID, int index) {
 		for(int i = 0; i < array.length(); i++){
 			JSONObject obj = array.getJSONObject(i);
 			String newKey = key + "_member_" + i;
 			Node node = new Node(newKey, "", rootID, parentID);
+			//update parent node
+	    	Node parentNode = NodeTable.get(index);
+	    	parentNode.addChildren(node.getId());
+	    	NodeTable.set(index, parentNode);
+	    	//update end
 			NodeTable.add(node);
-	    	AddLink2Table(parentID, node.getId());
-			handleObject(obj, rootID, node.getId());
+	    	//AddLink2Table(parentID, node.getId());
+			handleObject(obj, rootID, node.getId(), index);
 		}		
 	}
 
@@ -391,7 +458,6 @@ public class Indexer {
 	
 	public static void AddLink2Table(int n1, int n2){
 		Link link = new Link(n1, n2);
-		/**TODO: Add to the list**/
 		LinkTable.add(link);
 	}
 
@@ -399,10 +465,6 @@ public class Indexer {
 		System.out.println(text.toString());		
 	}
 
-	public static void setCurrentNodeID(int cID) {
-		currentNodeId = cID;
-		
-	}
 	public static void clean(){
 		NodeTable = new ArrayList<Node>();
 		LinkTable = new ArrayList<Link>();
@@ -412,7 +474,5 @@ public class Indexer {
 		status = "Ready";
 		filePath = "";
 		fileName = "";
-		/**TODO: setCurrentNodeID**/
-		//setCurrentNodeID(0);
 	}	
 }

@@ -1,0 +1,3 @@
+{"state":"PA",
+ "city": "carnegie",
+ "apartments":{"evo":{"plans":{"studio":{"square":"782","price":"$1239"},"1b1b":{"square":"794","price":"$2305"},"2b2b":{"square":"1058","price":"$2982"}}},"summit":{"plans":{"studio":{"square":"772","price":"$1903"},"1b1b":{"square":"895","price":"$1903"},"2b2b":{"square":"876","price":"$2915"}}},"radian":{"plan":{"studio":{"square":"678","price":"$1204"},"1b1b":{"square":"704","price":"$2104"},"2b2b":{"square":"1224","price":"$3294"}}}}}

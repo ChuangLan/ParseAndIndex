@@ -8,6 +8,7 @@ public class Node {
 	private int parentID = -1;
 	private int rootID = -1;
 	private String permission = "";
+	private String children = "";
 	Node(String k, String v){
 		this.key = k;
 		this.value = v;
@@ -22,6 +23,10 @@ public class Node {
 		this.rootID = rID;
 		this.id = Indexer.currentNodeId;
 		Indexer.currentNodeId++;
+	}
+	
+	public void addChildren(int id){
+		children += "&" + id;
 	}
 	
 	public void setPermission(String userName){
@@ -63,6 +68,7 @@ public class Node {
 				.append("parentID", parentID)
 				.append("rootID", rootID)
 				.append("permission", permission)
+				.append("children", children)
 				;
 		return doc;
 		
